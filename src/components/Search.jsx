@@ -2,11 +2,16 @@ import "../App.css"
 import {Link} from "react-router-dom";
 import {useEffect, useState} from "react";
 import {API_BASEURL, API_KEY} from "../api.js"
+import {useDebounce} from "react-use";
 
 const Search = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+
+    //waits for the user to stop typing for 500ms on searchTerm update
+    useDebounce(() => setDebouncedSearchTerm(searchTerm), 500, [searchTerm]);
 
     useEffect(() => {
         const fetchSearchResults = async () => {
@@ -29,10 +34,10 @@ const Search = () => {
             }
         }
 
-        if (searchTerm !== "" && searchTerm.trim().length > 1) {
+        if (debouncedSearchTerm !== "" && debouncedSearchTerm.trim().length > 1) {
             void fetchSearchResults();
         }
-    }, [searchTerm]);
+    }, [debouncedSearchTerm]);
 
     return (
         <div className="search-page">
